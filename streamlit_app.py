@@ -41,19 +41,36 @@ if submitted:
         st.warning("Enter some review text first.")
     else:
         with st.spinner("Reading..."):
+        try:
+            # Wake up the Render backend (ignore errors if it is still starting)
             try:
-                res = requests.post(
-                    f"{API_BASE}/predict",
-                    json={"text": text, "model_name": MODEL_OPTIONS[model_label]},
-                    timeout=15,
-                )
-                res.raise_for_status()
-                data = res.json()
-                prob = data["probability_positive"]
-                label = data["label"]
-            except requests.exceptions.RequestException as e:
-                st.error(f"Couldn't reach the model backend at {API_BASE}. ({e})")
-                st.stop()
+                requests.get(f"{API_BASE}/health", timeout=60)
+            except requests.exceptions.RequestException:
+                pass
+
+            res = requests.post(
+                f"{API_BASE}/predict",
+                json={
+                    "text": text,
+                    "model_name": MODEL_OPTIONS[model_label]
+                },
+                timeout=60,
+            )
+
+            res.raise_for_status()
+
+            data = res.json()
+            prob = data["probability_positive"]
+            label = data["label"]
+
+        except requests.exceptions.RequestException as e:
+            st.error(
+                "The backend is starting or temporarily unavailable.\n\n"
+                "If this is the first request after inactivity on Render Free, "
+                "please wait about 30–60 seconds and try again.\n\n"
+                f"Technical details: {e}"
+            )
+            st.stop()
 
         color = "#5B7A5E" if label == "positive" else "#A2432E"
         fig = go.Figure(go.Indicator(
