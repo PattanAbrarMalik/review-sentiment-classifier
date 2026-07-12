@@ -14,8 +14,8 @@ st.set_page_config(page_title="Sentiment Reader", page_icon="📝", layout="cent
 # Locally, falls back to localhost since no secrets.toml exists yet.
 try:
     API_BASE = st.secrets["API_BASE"]
-except (FileNotFoundError, KeyError):
-    API_BASE = "http://localhost:8000"
+except Exception:
+    API_BASE = "https://review-sentiment-classifier-u9u4.onrender.com"
 
 MODEL_OPTIONS = {
     "N-grams": "n_gram",
