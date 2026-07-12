@@ -1,6 +1,8 @@
-fastapi>=0.116.0
-uvicorn[standard]>=0.35.0
-
+fastapi
+uvicorn
+streamlit
+requests
+plotly
 nltk>=3.10.0
 pandas>=2.3.0
 scikit-learn==1.9.0
